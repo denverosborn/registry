@@ -2,7 +2,7 @@
 need to have mirror-registry.tar.gz in /output/mirror_registry
 
 This was tested with a site.yaml
-"
+```
 - name: test
   strategy: debug
   hosts: localhost
@@ -15,4 +15,4 @@ This was tested with a site.yaml
   - oc_mirror_tar_output: /root/mirror_seq1_000000.tar
   roles:
     - mirror-registry
-"
+```
