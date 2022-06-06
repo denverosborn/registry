@@ -1,8 +1,8 @@
 
 need to have mirror-registry.tar.gz in /output/mirror_registry
 
-This was tested with 
----
+This was tested with a site.yaml
+
 - name: test
   strategy: debug
   hosts: localhost
