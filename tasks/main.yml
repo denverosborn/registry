@@ -1,10 +1,3 @@
-#registry
----
-- name: "{{ role_name }} | Prepare download directory"
-  file:
-    state: directory
-    path: '{{ controller_mirror_registry_download_dir }}'
-
 - name: Ensure directories exist
   become: true
   file:
@@ -20,22 +13,15 @@
     dest: '{{ ansible_env["HOME"] }}'
     creates: '{{ ansible_env["HOME"] }}/mirror-registry'
 
-- name: Create registry certificates
-  command: openssl req -newkey rsa:3072 -nodes -sha256 -keyout /etc/quay/pki/ssl.key -x509 -days 365 -out /etc/quay/pki/ssl.cert -subj "/C=US/CN=${local_registry%:*}" -addext "subjectAltName=IP:127.0.0.1,DNS:localhost"
+    #- name: Create registry certificates
+    #  command: openssl req -newkey rsa:3072 -nodes -sha256 -keyout /etc/quay/pki/ssl.key -x509 -days 365 -out /etc/quay/pki/ssl.cert -subj "/C=US/CN=localhost" -addext "subjectAltName=IP:{{ quay_host_ip }},DNS:{{ quay_hostname }}"
 
 - name: Create Mirror Registry instance
   shell: >
-    ./mirror-registry install
-    --initUser '{{ registry_admin.username }}'
-    --initPassword '{{ registry_admin.password }}'
-    --quayHostname '{{ private_hostname }}:443'
-    --quayRoot /etc/quay/data
-    --sslCert /etc/quay/pki/ssl.cert
-    --sslKey /etc/quay/pki/ssl.key
-    --sslCheckSkip
+         ./mirror-registry install --initUser '{{ registry_admin.username }}' --initPassword '{{ registry_admin.password }}' --quayHostname '{{ private_hostname }}:8443' --sslCert /etc/quay/pki/ssl.cert --sslKey /etc/quay/pki/ssl.key
   args:
-    chdir: '{{ ansible_env["HOME"] }}'
-    creates: /etc/systemd/system/quay-pod.service
+    chdir: /root # '{{ ansible_env["HOME"] }}'
+    # creates: /etc/systemd/system/quay-pod.service
   async: 1800  # wait up to half an hour for installation of the mirror registry
   poll: 5
   register: mirror_registry_install
@@ -54,10 +40,18 @@
 
 - name: Wait for Mirror Registry to report ready
   shell: >
-    curl -k https://localhost/api/v1/superuser/registrystatus |
-    python3 -c 'import json, sys; print(json.loads(sys.stdin.read())["status"])'
+          curl -k https://localhost:8443/api/v1/superuser/registrystatus |
+          python3 -c 'import json, sys; print(json.loads(sys.stdin.read())["status"])'
   changed_when: false
   register: quay_status
   until: '"ready" in quay_status.stdout'
   retries: 60
   delay: 5
+
+#this will add username/pw auth to config.json
+- name: Log into mirror-registry
+  shell: podman login -u '{{ registry_admin.username }}' -p '{{ registry_admin.password }}' --authfile {{ json_pull_secret }} {{ quay_hostname }}:8443
+
+- name: oc-mirror to populate the mirror-registry
+  shell: oc-mirror --from={{ oc_mirror_tar_output }} docker://{{ quay_hostname }}:8443
+  when: true
