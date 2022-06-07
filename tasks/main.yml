@@ -13,8 +13,8 @@
     dest: '{{ ansible_env["HOME"] }}'
     creates: '{{ ansible_env["HOME"] }}/mirror-registry'
 
-    #- name: Create registry certificates
-    #  command: openssl req -newkey rsa:3072 -nodes -sha256 -keyout /etc/quay/pki/ssl.key -x509 -days 365 -out /etc/quay/pki/ssl.cert -subj "/C=US/CN=localhost" -addext "subjectAltName=IP:{{ quay_host_ip }},DNS:{{ quay_hostname }}"
+- name: Create registry certificates
+  command: openssl req -newkey rsa:3072 -nodes -sha256 -keyout /etc/quay/pki/ssl.key -x509 -days 365 -out /etc/quay/pki/ssl.cert -subj "/C=US/CN=localhost" -addext "subjectAltName=IP:{{ quay_host_ip }},DNS:{{ quay_hostname }}"
 
 - name: Create Mirror Registry instance
   shell: >
