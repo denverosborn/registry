@@ -1,8 +1,8 @@
 ---
-- name: "{{ role_name }} | Prepare download directory"
-  file:
-    state: directory
-    path: '{{ controller_mirror_registry_download_dir }}'
+#- name: "{{ role_name }} | Prepare download directory"
+#  file:
+#    state: directory
+#    path: '{{ controller_mirror_registry_download_dir }}'
 #
 #- name: Download the Mirror registry sums
 #get_url:
