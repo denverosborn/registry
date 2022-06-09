@@ -100,8 +100,8 @@
 
 #this will add username/pw auth to config.json
 - name: Log into mirror-registry
-  shell: podman login -u '{{ registry_admin.username }}' -p '{{ registry_admin.password }}' --authfile {{ json_pull_secret }} {{ quay_hostname }}:8443
+  shell: podman login -u '{{ registry_admin.username }}' -p '{{ registry_admin.password }}' --authfile {{ json_pull_secret }} {{ quay_hostname }}:8443 --tls-verify=false
 
 - name: oc-mirror to populate the mirror-registry
-  shell: oc-mirror --from={{ oc_mirror_tar_output }} docker://{{ quay_hostname }}:8443
+  shell: oc-mirror --from={{ oc_mirror_tar_output }} docker://{{ quay_hostname }}:8443 --dest-skip-tls
   when: true
