@@ -94,20 +94,16 @@
   command: update-ca-trust
   when: cert_in_anchors.changed
 
-- name: Wait for Mirror Registry to report ready
-  shell: >
-          curl -k https://{{ quay_hostname }}:8443/api/v1/superuser/registrystatus |
-          python3 -c 'import json, sys; print(json.loads(sys.stdin.read())["status"])'
-  changed_when: false
-  register: quay_status
-  until: '"ready" in quay_status.stdout'
-  retries: 60
-  delay: 5
+- name: check quay_status
+  uri:
+    url: https://{{ quay_hostname }}:8443/api/v1/superuser/registrystatus
+    method: GET
+    status_code: 200
 
 #this will add username/pw auth to config.json
 - name: Log into mirror-registry
   shell: podman login -u '{{ registry_admin.username }}' -p '{{ registry_admin.password }}' --authfile {{ json_pull_secret }} {{ quay_hostname }}:8443 --tls-verify=false
 
-- name: oc-mirror to populate the mirror-registry
-  shell: oc-mirror --from={{ oc_mirror_tar_output }} docker://{{ quay_hostname }}:8443 --dest-skip-tls
-  when: true
+#- name: oc-mirror to populate the mirror-registry
+#  shell: oc-mirror --from={{ oc_mirror_tar_output }} docker://{{ quay_hostname }}:8443 --dest-skip-tls
+#  when: true
