@@ -35,6 +35,12 @@
 #chdir: '{{ controller_mirror_registry_download_dir }}'
 #changed_when: false
 
+- name: unpack ocp-images.tar
+  unarchive:
+    src: /root/ocp-images.tar
+    dest: /root/
+    remote_src: true
+    
 - name: Ensure directories exist
   become: true
   file:
