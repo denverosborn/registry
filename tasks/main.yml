@@ -40,7 +40,7 @@
     src: /root/ocp-images.tar
     dest: /root/
     remote_src: true
-    
+
 - name: Ensure directories exist
   become: true
   file:
@@ -96,7 +96,7 @@
 
 - name: Wait for Mirror Registry to report ready
   shell: >
-          curl -k https://localhost:8443/api/v1/superuser/registrystatus |
+          curl -k https://{{ quay_hostname }}:8443/api/v1/superuser/registrystatus |
           python3 -c 'import json, sys; print(json.loads(sys.stdin.read())["status"])'
   changed_when: false
   register: quay_status
