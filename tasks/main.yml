@@ -38,7 +38,7 @@
 - name: unpack ocp-images.tar
   unarchive:
     src: /root/ocp-images.tar
-    dest: /root/
+    dest: /root/utility
     remote_src: true
 
 - name: Ensure directories exist
