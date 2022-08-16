@@ -37,7 +37,7 @@
 
 - name: unpack ocp-images.tar
   unarchive:
-    src: /root/ocp-images.tar
+    src: /root/utility/ocp-images.tar
     dest: /root/utility
     remote_src: true
 
